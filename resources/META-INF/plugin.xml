@@ -1,0 +1,42 @@
+<idea-plugin>
+  <id>com.pablogsal.black</id>
+  <name>black-pycharm</name>
+  <version>1.0.2</version>
+  <vendor email="pablogsal@gmail.com" url="https://github.com/pablogsal/black-pycharm">Pablo Galindo</vendor>
+
+  <description><![CDATA[
+      Reformat (local) python code using black.
+
+      Requirement:
+      + `black` must be pre-installed.
+
+    ]]></description>
+
+  <change-notes></change-notes>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <idea-version since-build="173.0"/>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+  <!-- uncomment to enable plugin in all products
+  <depends>com.intellij.modules.lang</depends>
+  -->
+
+   <depends>com.intellij.modules.lang</depends>
+   <depends>com.intellij.modules.platform</depends>
+
+
+    <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+  </extensions>
+
+  <actions>
+    <action id="BLACKReformatCode" class="ReformatCode" text="Reformat code (BLACK)" description="Reformat code using BLACK">
+      <add-to-group group-id="CodeFormatGroup" anchor="first"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="meta alt L"/>
+    </action>
+
+  </actions>
+
+</idea-plugin>

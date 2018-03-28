@@ -1,7 +1,7 @@
 <idea-plugin>
   <id>com.pablogsal.black</id>
   <name>black-pycharm</name>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <vendor email="pablogsal@gmail.com" url="https://github.com/pablogsal/black-pycharm">Pablo Galindo</vendor>
 
   <description><![CDATA[
@@ -26,10 +26,10 @@
    <depends>com.intellij.modules.lang</depends>
    <depends>com.intellij.modules.platform</depends>
 
-
     <extensions defaultExtensionNs="com.intellij">
-    <!-- Add your extensions here -->
-  </extensions>
+        <projectConfigurable groupId="tools" displayName="BlackPycharm Configuration" id="preferences.BlackPycharmConfigurable" instance="BlackPycharmConfigurable" />
+        <projectService serviceInterface="BlackPycharmConfig" serviceImplementation="BlackPycharmConfig"/>
+    </extensions>
 
   <actions>
     <action id="BLACKReformatCode" class="ReformatCode" text="Reformat code (BLACK)" description="Reformat code using BLACK">

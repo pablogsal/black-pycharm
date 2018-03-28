@@ -2,10 +2,12 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.Application;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 
 import java.io.*;
@@ -13,6 +15,9 @@ import java.io.*;
 public class ReformatCode extends AnAction {
 
     private Logger logger;
+    private BlackPycharmConfig config;
+    private Project project;
+
 
     public ReformatCode() {
         super();
@@ -41,11 +46,13 @@ public class ReformatCode extends AnAction {
 
     private byte[] reformatFile(String path) throws InterruptedException, IOException {
 
+        String black_path = config.getExecutableName();
         // Invoke black.
         Process black_p = Runtime.getRuntime().exec(new String[]{
                 "sh", "-c",
-                String.format("cat '%s' | /usr/local/bin/black -", path)
+                String.format("cat '%s' | '%s' -", path, black_path)
         });
+
         black_p.waitFor();
 
         if (black_p.exitValue() != 0) {
@@ -55,6 +62,7 @@ public class ReformatCode extends AnAction {
 
         // read the formatted content
         return getProcessStdout(black_p);
+
     }
 
     private void writeFileContent(InputStream inputStream, OutputStream outputStream) throws IOException {
@@ -68,6 +76,10 @@ public class ReformatCode extends AnAction {
 
     @Override
     public void actionPerformed(AnActionEvent event) {
+
+        project = event.getRequiredData(CommonDataKeys.PROJECT);
+        config = BlackPycharmConfig.getInstance(project);
+
         // extract current open file, it could be file or folder or null it doesn't get focus
         VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
 

@@ -1,14 +1,17 @@
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.Application;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.MessageType;
+import com.intellij.openapi.ui.popup.Balloon;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.wm.StatusBar;
+import com.intellij.openapi.wm.WindowManager;
+import com.intellij.ui.awt.RelativePoint;
 
 import java.io.*;
 
@@ -17,7 +20,6 @@ public class ReformatCode extends AnAction {
     private Logger logger;
     private BlackPycharmConfig config;
     private Project project;
-
 
     public ReformatCode() {
         super();
@@ -56,8 +58,8 @@ public class ReformatCode extends AnAction {
         black_p.waitFor();
 
         if (black_p.exitValue() != 0) {
-            logger.error(getProcessStderr(black_p));
-            throw new RuntimeException("Couldn't invoke reformat command");
+            String error_msg = new String(getProcessStderr(black_p));
+            throw new RuntimeException(error_msg);
         }
 
         // read the formatted content
@@ -72,6 +74,20 @@ public class ReformatCode extends AnAction {
         while ((read = inputStream.read(bytes)) != -1) {
             outputStream.write(bytes, 0, read);
         }
+    }
+
+    public void displayErrorMessage(AnActionEvent event, String message) {
+        StatusBar statusBar = WindowManager.getInstance()
+                .getStatusBar(DataKeys.PROJECT.getData(event.getDataContext()));
+
+
+        JBPopupFactory.getInstance()
+                .createHtmlTextBalloonBuilder("BlackPycharm: " + message,
+                        MessageType.ERROR, null)
+                .setFadeoutTime(7500)
+                .createBalloon()
+                .show(RelativePoint.getSouthEastOf(statusBar.getComponent()),
+                        Balloon.Position.atRight);
     }
 
     @Override
@@ -116,8 +132,8 @@ public class ReformatCode extends AnAction {
                     throw new RuntimeException(e);
                 }
             });
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+        } catch (IOException | InterruptedException | RuntimeException e) {
+            this.displayErrorMessage(event, e.getMessage());
         }
     }
 }

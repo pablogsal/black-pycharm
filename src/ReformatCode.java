@@ -51,8 +51,7 @@ public class ReformatCode extends AnAction {
         String black_path = config.getExecutableName();
         // Invoke black.
         Process black_p = Runtime.getRuntime().exec(new String[]{
-                "sh", "-c",
-                String.format("cat '%s' | '%s' -", path, black_path)
+                black_path, path,
         });
 
         black_p.waitFor();
@@ -78,7 +77,7 @@ public class ReformatCode extends AnAction {
 
     public void displayErrorMessage(AnActionEvent event, String message) {
         StatusBar statusBar = WindowManager.getInstance()
-                .getStatusBar(DataKeys.PROJECT.getData(event.getDataContext()));
+                .getStatusBar(PlatformDataKeys.PROJECT.getData(event.getDataContext()));
 
 
         JBPopupFactory.getInstance()
@@ -120,17 +119,12 @@ public class ReformatCode extends AnAction {
             fileDocumentManager.saveDocument(document);
 
             // reformat it using black
-            byte[] formattedContent = this.reformatFile(virtualFile.getPath());
+            this.reformatFile(virtualFile.getPath());
 
-            // unlock the file & write changes
+            // unlock the file & refresh
             Application app = ApplicationManager.getApplication();
             app.runWriteAction(() -> {
-                try {
-                    virtualFile.setBinaryContent(formattedContent);
-                    virtualFile.refresh(false, false);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                virtualFile.refresh(false, false);
             });
         } catch (IOException | InterruptedException | RuntimeException e) {
             this.displayErrorMessage(event, e.getMessage());

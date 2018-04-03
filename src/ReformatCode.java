@@ -52,7 +52,8 @@ public class ReformatCode extends AnAction {
         // Invoke black.
         Process black_p = Runtime.getRuntime().exec(new String[]{
                 "sh", "-c",
-                String.format("cat '%s' | '%s' -", path, black_path)
+                String.format("export LC_ALL=en_US.UTF-8 && export LANG=en_US.UTF-8 " +
+                        "&& cat '%s' | '%s' -", path, black_path)
         });
 
         black_p.waitFor();
@@ -78,7 +79,7 @@ public class ReformatCode extends AnAction {
 
     public void displayErrorMessage(AnActionEvent event, String message) {
         StatusBar statusBar = WindowManager.getInstance()
-                .getStatusBar(DataKeys.PROJECT.getData(event.getDataContext()));
+                .getStatusBar(PlatformDataKeys.PROJECT.getData(event.getDataContext()));
 
 
         JBPopupFactory.getInstance()

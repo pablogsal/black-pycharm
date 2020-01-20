@@ -21,115 +21,123 @@ import java.util.Objects;
 
 public class ReformatCode extends AnAction {
 
-  private BlackPycharmConfig config;
+    private BlackPycharmConfig config;
 
-  public ReformatCode() {
-    super();
-  }
-
-  private byte[] toByteArray(InputStream inputStream) throws IOException {
-    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    int read;
-    byte[] bytes = new byte[1024];
-
-    while ((read = inputStream.read(bytes)) != -1) {
-      byteArrayOutputStream.write(bytes, 0, read);
+    public ReformatCode() {
+        super();
     }
 
-    return byteArrayOutputStream.toByteArray();
-  }
+    private byte[] toByteArray(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        int read;
+        byte[] bytes = new byte[1024];
 
-  // --Commented out by Inspection START (20/01/2020 16:17):
-  //  private byte[] getProcessStdout(Process p) throws IOException {
-  //    return toByteArray(p.getInputStream());
-  //  }
-  // --Commented out by Inspection STOP (20/01/2020 16:17)
+        while ((read = inputStream.read(bytes)) != -1) {
+            byteArrayOutputStream.write(bytes, 0, read);
+        }
 
-  private byte[] getProcessStderr(Process p) throws IOException {
-    return toByteArray(p.getErrorStream());
-  }
-
-  private void reformatFile(String path) throws InterruptedException, IOException {
-
-    String blackPath = config.getExecutableName();
-    // Invoke Black.
-    Process blackProcess = Runtime.getRuntime().exec(new String[]{
-        blackPath, path,
-    });
-
-    blackProcess.waitFor();
-
-    if (blackProcess.exitValue() != 0) {
-      String errorMsg = new String(getProcessStderr(blackProcess));
-      throw new RuntimeException(errorMsg);
-    }
-  }
-
-  // --Commented out by Inspection START (20/01/2020 16:09):
-  //  private void writeFileContent(InputStream inputStream, OutputStream outputStream)
-  //          throws IOException {
-  //    int read;
-  //    byte[] bytes = new byte[1024];
-  //
-  //    while ((read = inputStream.read(bytes)) != -1) {
-  //      outputStream.write(bytes, 0, read);
-  //    }
-  //  }
-  // --Commented out by Inspection STOP (20/01/2020 16:09)
-
-  private void displayErrorMessage(AnActionEvent event, String message) {
-    StatusBar statusBar = WindowManager.getInstance()
-            .getStatusBar(Objects.requireNonNull(
-                    PlatformDataKeys.PROJECT.getData(event.getDataContext())));
-
-
-    JBPopupFactory.getInstance()
-            .createHtmlTextBalloonBuilder("BlackPycharm: " + message,
-                    MessageType.ERROR, null)
-            .setFadeoutTime(7500)
-            .createBalloon()
-            .show(RelativePoint.getSouthEastOf(statusBar.getComponent()),
-                    Balloon.Position.atRight);
-  }
-
-  @Override
-  public void actionPerformed(AnActionEvent event) {
-
-    Project project = event.getRequiredData(CommonDataKeys.PROJECT);
-    config = BlackPycharmConfig.getInstance(project);
-
-    // extract current open file, it could be file or folder or null it doesn't get focus
-    VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
-
-    if (virtualFile == null || virtualFile.isDirectory()) {
-      return;
+        return byteArrayOutputStream.toByteArray();
     }
 
-    String path = virtualFile.getPath();
+    // --Commented out by Inspection START (20/01/2020 16:17):
+    //  private byte[] getProcessStdout(Process p) throws IOException {
+    //    return toByteArray(p.getInputStream());
+    //  }
+    // --Commented out by Inspection STOP (20/01/2020 16:17)
 
-    if (!path.endsWith(".py")) {
-      return;
+    private byte[] getProcessStderr(Process p) throws IOException {
+        return toByteArray(p.getErrorStream());
     }
 
-    if (!virtualFile.isWritable()) {
-      return;
+    private String[] getCommand(String path) {
+        return new String[]{
+                config.getExecutableName(),
+                path,
+                "--line-length",
+                config.getMaxLineLength()
+        };
     }
 
-    try {
-      // save changes so that IDE doesn't display message box
-      FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
-      Document document = fileDocumentManager.getDocument(virtualFile);
-      assert document != null;
-      fileDocumentManager.saveDocument(document);
+    private void reformatFile(String path) throws InterruptedException, IOException {
 
-      // reformat it using Black
-      this.reformatFile(virtualFile.getPath());
+        // invoke Black
+        Process blackProcess = Runtime.getRuntime().exec(getCommand(path));
 
-      // unlock the file & refresh
-      Application app = ApplicationManager.getApplication();
-      app.runWriteAction(() -> virtualFile.refresh(false, false));
-    } catch (IOException | InterruptedException | RuntimeException e) {
-      this.displayErrorMessage(event, e.getMessage());
+        blackProcess.waitFor();
+
+        if (blackProcess.exitValue() != 0) {
+            // ToDo Address default encoding issue identified by FindBugs-IDEA
+            //  Use an alternative API and specify a charset name or Charset object explicitly.
+            String errorMsg = new String(getProcessStderr(blackProcess));
+            throw new RuntimeException(errorMsg);
+        }
     }
-  }
+
+    // --Commented out by Inspection START (20/01/2020 16:09):
+    //  private void writeFileContent(InputStream inputStream, OutputStream outputStream)
+    //          throws IOException {
+    //    int read;
+    //    byte[] bytes = new byte[1024];
+    //
+    //    while ((read = inputStream.read(bytes)) != -1) {
+    //      outputStream.write(bytes, 0, read);
+    //    }
+    //  }
+    // --Commented out by Inspection STOP (20/01/2020 16:09)
+
+    private void displayErrorMessage(AnActionEvent event, String message) {
+        StatusBar statusBar = WindowManager.getInstance()
+                .getStatusBar(Objects.requireNonNull(
+                        PlatformDataKeys.PROJECT.getData(event.getDataContext())));
+
+
+        JBPopupFactory.getInstance()
+                .createHtmlTextBalloonBuilder("BlackPycharm: " + message,
+                        MessageType.ERROR, null)
+                .setFadeoutTime(7500)
+                .createBalloon()
+                .show(RelativePoint.getSouthEastOf(statusBar.getComponent()),
+                        Balloon.Position.atRight);
+    }
+
+    @Override
+    public void actionPerformed(AnActionEvent event) {
+
+        Project project = event.getRequiredData(CommonDataKeys.PROJECT);
+        config = BlackPycharmConfig.getInstance(project);
+
+        // extract current open file, it could be file or folder or null it doesn't get focus
+        VirtualFile virtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE);
+
+        if (virtualFile == null || virtualFile.isDirectory()) {
+            return;
+        }
+
+        String path = virtualFile.getPath();
+
+        if (!path.endsWith(".py")) {
+            return;
+        }
+
+        if (!virtualFile.isWritable()) {
+            return;
+        }
+
+        try {
+            // save changes so that IDE doesn't display message box
+            FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
+            Document document = fileDocumentManager.getDocument(virtualFile);
+            assert document != null;
+            fileDocumentManager.saveDocument(document);
+
+            // reformat it using Black
+            this.reformatFile(virtualFile.getPath());
+
+            // unlock the file & refresh
+            Application app = ApplicationManager.getApplication();
+            app.runWriteAction(() -> virtualFile.refresh(false, false));
+        } catch (IOException | InterruptedException | RuntimeException e) {
+            this.displayErrorMessage(event, e.getMessage());
+        }
+    }
 }

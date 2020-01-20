@@ -20,6 +20,8 @@ public class BlackPycharmGUI {
     private JCheckBox notShowDialogCheckBox;
     private JPanel exeNameSetting;
     private JButton pathSelectorButton;
+    private JTextField maxLineLengthTextField;
+    private JPanel maxLineLengthSetting;
     private JTextField runtimeOutputDirectoryTextField;
     private BlackPycharmConfig mConfig;
 
@@ -45,6 +47,7 @@ public class BlackPycharmGUI {
     public void createUI(Project project) {
         mConfig = BlackPycharmConfig.getInstance(project);
         exeNameTextField.setText(mConfig.getExecutableName());
+        maxLineLengthTextField.setText(mConfig.getMaxLineLength());
     }
 
     public JPanel getRootPanel() {
@@ -58,15 +61,18 @@ public class BlackPycharmGUI {
     public boolean isModified() {
         boolean modified = false;
         modified |= !exeNameTextField.getText().equals(mConfig.getExecutableName());
+        modified |= !maxLineLengthTextField.getText().equals(mConfig.getMaxLineLength());
         return modified;
     }
 
     public void apply() {
         mConfig.setExecutableName(exeNameTextField.getText());
+        mConfig.setMaxLineLength(maxLineLengthTextField.getText().trim());
     }
 
     public void reset() {
         exeNameTextField.setText(mConfig.getExecutableName());
+        maxLineLengthTextField.setText(mConfig.getMaxLineLength());
     }
 
        /**

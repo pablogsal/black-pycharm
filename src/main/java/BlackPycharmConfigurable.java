@@ -1,4 +1,3 @@
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import javax.swing.JComponent;
@@ -8,14 +7,15 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * This ProjectConfigurable class appears on Settings dialog,
- * to let user to configure this plugin's behavior.
+ * to let the user configure this plugin's behavior.
  */
 public class BlackPycharmConfigurable implements SearchableConfigurable {
 
   private BlackPycharmGUI gui;
+
+  @SuppressWarnings({"FieldCanBeLocal", "unused"})
   private final BlackPycharmConfig config;
 
-  @SuppressWarnings("FieldCanBeLocal")
   private final Project project;
 
   public BlackPycharmConfigurable(@NotNull Project project) {
@@ -61,7 +61,7 @@ public class BlackPycharmConfigurable implements SearchableConfigurable {
   }
 
   @Override
-  public void apply() throws ConfigurationException {
+  public void apply() {
     gui.apply();
   }
 

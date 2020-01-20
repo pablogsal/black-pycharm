@@ -4,11 +4,12 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * PersistentStateComponent keeps project config values.
- * Similar notion of 'preference' in Android
+ * Similar to the notion of 'preference' in Android
  */
 @State(
     name = "BlackPycharmConfig",
@@ -45,13 +46,12 @@ public class BlackPycharmConfig implements PersistentStateComponent<BlackPycharm
   }
 
   @Override
-  public void loadState(BlackPycharmConfig blackPycharmConfig) {
+  public void loadState(@NotNull BlackPycharmConfig blackPycharmConfig) {
     XmlSerializerUtil.copyBean(blackPycharmConfig, this);
   }
 
   @Nullable
   public static BlackPycharmConfig getInstance(Project project) {
-    BlackPycharmConfig sfec = ServiceManager.getService(project, BlackPycharmConfig.class);
-    return sfec;
+    return ServiceManager.getService(project, BlackPycharmConfig.class);
   }
 }

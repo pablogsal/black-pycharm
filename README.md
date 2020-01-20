@@ -1,8 +1,8 @@
 # black-pycharm
 
 ## General usage instructions
-* To use this plugin, [black](https://black.readthedocs.io/en/stable/) must be installed.
-* By default, the plugin assumes that the black binary is `/usr/local/bin/black`. 
+* To use this plugin, [Black](https://black.readthedocs.io/en/stable/) must be installed.
+* By default, the plugin assumes that the Black binary is `/usr/local/bin/black`. 
 
 ## Development instructions
 * Open the repository root folder with IntelliJ IDEA.

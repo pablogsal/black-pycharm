@@ -52,7 +52,7 @@ public class ReformatCode extends AnAction {
   private void reformatFile(String path) throws InterruptedException, IOException {
 
     String blackPath = config.getExecutableName();
-    // Invoke black.
+    // Invoke Black.
     Process blackProcess = Runtime.getRuntime().exec(new String[]{
         blackPath, path,
     });
@@ -122,7 +122,7 @@ public class ReformatCode extends AnAction {
       assert document != null;
       fileDocumentManager.saveDocument(document);
 
-      // reformat it using black
+      // reformat it using Black
       this.reformatFile(virtualFile.getPath());
 
       // unlock the file & refresh

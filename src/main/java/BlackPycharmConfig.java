@@ -27,9 +27,11 @@ public class BlackPycharmConfig implements PersistentStateComponent<BlackPycharm
 
   }
 
+
   String getExecutableName() {
     if (executableName == null) {
       // Error, it should not happen
+      assert false;
       executableName = "";
     }
     return executableName;

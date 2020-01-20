@@ -5,10 +5,10 @@
   <vendor email="pablogsal@gmail.com" url="https://github.com/pablogsal/black-pycharm">Pablo Galindo</vendor>
 
   <description><![CDATA[
-      Reformat (local) python code using black.
+      Reformat (local) python code using Black.
 
       Requirement:
-      + `black` must be pre-installed.
+      + `Black` must be pre-installed.
 
     ]]></description>
 
@@ -32,7 +32,7 @@
     </extensions>
 
   <actions>
-    <action id="BLACKReformatCode" class="ReformatCode" text="Reformat code (BLACK)" description="Reformat code using BLACK">
+    <action id="BLACKReformatCode" class="ReformatCode" text="Reformat code (Black)" description="Reformat code using Black">
       <add-to-group group-id="CodeFormatGroup" anchor="first"/>
       <keyboard-shortcut keymap="$default" first-keystroke="meta alt L"/>
     </action>

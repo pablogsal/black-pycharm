@@ -17,18 +17,14 @@ import com.intellij.ui.awt.RelativePoint;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import org.apache.log4j.Logger;
+import java.util.Objects;
 
 public class ReformatCode extends AnAction {
 
-  private Logger logger;
   private BlackPycharmConfig config;
-  private Project project;
 
   public ReformatCode() {
     super();
-    this.logger = Logger.getLogger(ReformatCode.class);
   }
 
   private byte[] toByteArray(InputStream inputStream) throws IOException {
@@ -43,15 +39,17 @@ public class ReformatCode extends AnAction {
     return byteArrayOutputStream.toByteArray();
   }
 
-  private byte[] getProcessStdout(Process p) throws IOException {
-    return toByteArray(p.getInputStream());
-  }
+  // --Commented out by Inspection START (20/01/2020 16:17):
+  //  private byte[] getProcessStdout(Process p) throws IOException {
+  //    return toByteArray(p.getInputStream());
+  //  }
+  // --Commented out by Inspection STOP (20/01/2020 16:17)
 
   private byte[] getProcessStderr(Process p) throws IOException {
     return toByteArray(p.getErrorStream());
   }
 
-  private byte[] reformatFile(String path) throws InterruptedException, IOException {
+  private void reformatFile(String path) throws InterruptedException, IOException {
 
     String blackPath = config.getExecutableName();
     // Invoke black.
@@ -65,25 +63,24 @@ public class ReformatCode extends AnAction {
       String errorMsg = new String(getProcessStderr(blackProcess));
       throw new RuntimeException(errorMsg);
     }
-
-    // read the formatted content
-    return getProcessStdout(blackProcess);
-
   }
 
-  private void writeFileContent(InputStream inputStream, OutputStream outputStream)
-          throws IOException {
-    int read;
-    byte[] bytes = new byte[1024];
-
-    while ((read = inputStream.read(bytes)) != -1) {
-      outputStream.write(bytes, 0, read);
-    }
-  }
+  // --Commented out by Inspection START (20/01/2020 16:09):
+  //  private void writeFileContent(InputStream inputStream, OutputStream outputStream)
+  //          throws IOException {
+  //    int read;
+  //    byte[] bytes = new byte[1024];
+  //
+  //    while ((read = inputStream.read(bytes)) != -1) {
+  //      outputStream.write(bytes, 0, read);
+  //    }
+  //  }
+  // --Commented out by Inspection STOP (20/01/2020 16:09)
 
   private void displayErrorMessage(AnActionEvent event, String message) {
     StatusBar statusBar = WindowManager.getInstance()
-            .getStatusBar(PlatformDataKeys.PROJECT.getData(event.getDataContext()));
+            .getStatusBar(Objects.requireNonNull(
+                    PlatformDataKeys.PROJECT.getData(event.getDataContext())));
 
 
     JBPopupFactory.getInstance()
@@ -98,7 +95,7 @@ public class ReformatCode extends AnAction {
   @Override
   public void actionPerformed(AnActionEvent event) {
 
-    project = event.getRequiredData(CommonDataKeys.PROJECT);
+    Project project = event.getRequiredData(CommonDataKeys.PROJECT);
     config = BlackPycharmConfig.getInstance(project);
 
     // extract current open file, it could be file or folder or null it doesn't get focus
@@ -122,6 +119,7 @@ public class ReformatCode extends AnAction {
       // save changes so that IDE doesn't display message box
       FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
       Document document = fileDocumentManager.getDocument(virtualFile);
+      assert document != null;
       fileDocumentManager.saveDocument(document);
 
       // reformat it using black
@@ -129,9 +127,7 @@ public class ReformatCode extends AnAction {
 
       // unlock the file & refresh
       Application app = ApplicationManager.getApplication();
-      app.runWriteAction(() -> {
-        virtualFile.refresh(false, false);
-      });
+      app.runWriteAction(() -> virtualFile.refresh(false, false));
     } catch (IOException | InterruptedException | RuntimeException e) {
       this.displayErrorMessage(event, e.getMessage());
     }

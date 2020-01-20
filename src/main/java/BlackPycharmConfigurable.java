@@ -1,27 +1,26 @@
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
+import javax.swing.JComponent;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-
 /**
  * This ProjectConfigurable class appears on Settings dialog,
- * to let user to configure this plugin's behavior.
+ * to let the user configure this plugin's behavior.
  */
 public class BlackPycharmConfigurable implements SearchableConfigurable {
 
-    private BlackPycharmGUI mGUI;
-    private final BlackPycharmConfig mConfig;
+    private BlackPycharmGUI gui;
 
-    @SuppressWarnings("FieldCanBeLocal")
-    private final Project mProject;
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
+    private final BlackPycharmConfig config;
+
+    private final Project project;
 
     public BlackPycharmConfigurable(@NotNull Project project) {
-        mProject = project;
-        mConfig = BlackPycharmConfig.getInstance(project);
+        this.project = project;
+        config = BlackPycharmConfig.getInstance(project);
     }
 
     @Nls
@@ -51,28 +50,28 @@ public class BlackPycharmConfigurable implements SearchableConfigurable {
     @Nullable
     @Override
     public JComponent createComponent() {
-        mGUI = new BlackPycharmGUI();
-        mGUI.createUI(mProject);
-        return mGUI.getRootPanel();
+        gui = new BlackPycharmGUI();
+        gui.createUI(project);
+        return gui.getRootPanel();
     }
 
     @Override
     public boolean isModified() {
-        return mGUI.isModified();
+        return gui.isModified();
     }
 
     @Override
-    public void apply() throws ConfigurationException {
-        mGUI.apply();
+    public void apply() {
+        gui.apply();
     }
 
     @Override
     public void reset() {
-        mGUI.reset();
+        gui.reset();
     }
 
     @Override
     public void disposeUIResources() {
-        mGUI = null;
+        gui = null;
     }
 }

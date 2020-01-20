@@ -11,46 +11,47 @@ import org.jetbrains.annotations.Nullable;
  * Similar notion of 'preference' in Android
  */
 @State(
-        name="BlackPycharmConfig",
-        storages = {
-                @Storage("BlackPycharmConfig.xml")}
+    name = "BlackPycharmConfig",
+    storages = {@Storage("BlackPycharmConfig.xml")}
 )
 public class BlackPycharmConfig implements PersistentStateComponent<BlackPycharmConfig> {
 
-    /* NOTE: member should be "public" to be saved in xml */
-    /* add_executable(): exe name */
-    static final String EXECUTABLE_NAME_FILENAME = "/usr/local/bin/black";
-    public static final String DEFAULT_EXECUTABLE_NAME = EXECUTABLE_NAME_FILENAME;
-    public String executableName = DEFAULT_EXECUTABLE_NAME;  // persistent member should be public
+  /* NOTE: member should be "public" to be saved in xml */
+  /* add_executable(): exe name */
+  static final String EXECUTABLE_NAME_FILENAME = "/usr/local/bin/black";
+  public static final String DEFAULT_EXECUTABLE_NAME = EXECUTABLE_NAME_FILENAME;
+  public String executableName = DEFAULT_EXECUTABLE_NAME;  // persistent member should be public
 
-    BlackPycharmConfig() { }
+  BlackPycharmConfig() {
 
-    String getExecutableName() {
-        if (executableName == null) {
-            // Error, it should not happen
-            executableName = "";
-        }
-        return executableName;
+  }
+
+  String getExecutableName() {
+    if (executableName == null) {
+      // Error, it should not happen
+      executableName = "";
     }
+    return executableName;
+  }
 
-    void setExecutableName(String executableName) {
-        this.executableName = executableName;
-    }
+  void setExecutableName(String executableName) {
+    this.executableName = executableName;
+  }
 
-    @Nullable
-    @Override
-    public BlackPycharmConfig getState() {
-        return this;
-    }
+  @Nullable
+  @Override
+  public BlackPycharmConfig getState() {
+    return this;
+  }
 
-    @Override
-    public void loadState(BlackPycharmConfig blackPycharmConfig) {
-        XmlSerializerUtil.copyBean(blackPycharmConfig, this);
-    }
+  @Override
+  public void loadState(BlackPycharmConfig blackPycharmConfig) {
+    XmlSerializerUtil.copyBean(blackPycharmConfig, this);
+  }
 
-    @Nullable
-    public static BlackPycharmConfig getInstance(Project project) {
-        BlackPycharmConfig sfec = ServiceManager.getService(project, BlackPycharmConfig.class);
-        return sfec;
-    }
+  @Nullable
+  public static BlackPycharmConfig getInstance(Project project) {
+    BlackPycharmConfig sfec = ServiceManager.getService(project, BlackPycharmConfig.class);
+    return sfec;
+  }
 }

@@ -1,11 +1,10 @@
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
+import javax.swing.JComponent;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
 
 /**
  * This ProjectConfigurable class appears on Settings dialog,
@@ -13,66 +12,66 @@ import javax.swing.*;
  */
 public class BlackPycharmConfigurable implements SearchableConfigurable {
 
-    private BlackPycharmGUI mGUI;
-    private final BlackPycharmConfig mConfig;
+  private BlackPycharmGUI gui;
+  private final BlackPycharmConfig config;
 
-    @SuppressWarnings("FieldCanBeLocal")
-    private final Project mProject;
+  @SuppressWarnings("FieldCanBeLocal")
+  private final Project project;
 
-    public BlackPycharmConfigurable(@NotNull Project project) {
-        mProject = project;
-        mConfig = BlackPycharmConfig.getInstance(project);
-    }
+  public BlackPycharmConfigurable(@NotNull Project project) {
+    this.project = project;
+    config = BlackPycharmConfig.getInstance(project);
+  }
 
-    @Nls
-    @Override
-    public String getDisplayName() {
-        return "BlackPycharm Configuration";
-    }
+  @Nls
+  @Override
+  public String getDisplayName() {
+    return "BlackPycharm Configuration";
+  }
 
-    @Nullable
-    @Override
-    public String getHelpTopic() {
-        return "preference.BlackPycharmConfigurable";
-    }
+  @Nullable
+  @Override
+  public String getHelpTopic() {
+    return "preference.BlackPycharmConfigurable";
+  }
 
-    @NotNull
-    @Override
-    public String getId() {
-        return "preference.BlackPycharmConfigurable";
-    }
+  @NotNull
+  @Override
+  public String getId() {
+    return "preference.BlackPycharmConfigurable";
+  }
 
-    @Nullable
-    @Override
-    public Runnable enableSearch(String s) {
-        return null;
-    }
+  @Nullable
+  @Override
+  public Runnable enableSearch(String s) {
+    return null;
+  }
 
-    @Nullable
-    @Override
-    public JComponent createComponent() {
-        mGUI = new BlackPycharmGUI();
-        mGUI.createUI(mProject);
-        return mGUI.getRootPanel();
-    }
+  @Nullable
+  @Override
+  public JComponent createComponent() {
+    gui = new BlackPycharmGUI();
+    gui.createUI(project);
+    return gui.getRootPanel();
+  }
 
-    @Override
-    public boolean isModified() {
-        return mGUI.isModified();
-    }
+  @Override
+  public boolean isModified() {
+    return gui.isModified();
+  }
 
-    @Override
-    public void apply() throws ConfigurationException {
-        mGUI.apply();
-    }
+  @Override
+  public void apply() throws ConfigurationException {
+    gui.apply();
+  }
 
-    @Override
-    public void reset() {
-        mGUI.reset();
-    }
+  @Override
+  public void reset() {
+    gui.reset();
+  }
 
-    @Override
-    public void disposeUIResources() {
-        mGUI = null;
-    }
+  @Override
+  public void disposeUIResources() {
+    gui = null;
+  }
 }
